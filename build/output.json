@@ -1,0 +1,733 @@
+{
+  "bicoredata.dwd_common_loc_country_ds": {
+    "tables": [""],
+
+    "sql": "this is a base table",
+
+    "columns": {
+      "omsite_cd": {
+        "lineage": [""],
+
+        "count_data": {}
+      },
+
+      "hiapp_country_cd": {
+        "lineage": [""],
+
+        "count_data": {}
+      }
+    }
+  },
+
+  "temp.tmp_dw_hiapp_gift_summary_stat_dm_2_20251001": {
+    "tables": [""],
+
+    "sql": "this is a base table",
+
+    "columns": {
+      "country_id": {
+        "lineage": [""],
+
+        "count_data": {}
+      },
+
+      "draw_users": {
+        "lineage": [""],
+
+        "count_data": {}
+      },
+
+      "campaign_id": {
+        "lineage": [""],
+
+        "count_data": {}
+      },
+
+      "hms_flg": {
+        "lineage": [""],
+
+        "count_data": {}
+      },
+
+      "appname": {
+        "lineage": [""],
+
+        "count_data": {}
+      },
+
+      "draw_others": {
+        "lineage": [""],
+
+        "count_data": {}
+      },
+
+      "download_users": {
+        "lineage": [""],
+
+        "count_data": {}
+      },
+
+      "award_ids": {
+        "lineage": [""],
+
+        "count_data": {}
+      },
+
+      "campaign_name": {
+        "lineage": [""],
+
+        "count_data": {}
+      },
+
+      "award_remain": {
+        "lineage": [""],
+
+        "count_data": {}
+      },
+
+      "award_name": {
+        "lineage": [""],
+
+        "count_data": {}
+      },
+
+      "download_cnt": {
+        "lineage": [""],
+
+        "count_data": {}
+      },
+
+      "award_count": {
+        "lineage": [""],
+
+        "count_data": {}
+      },
+
+      "draw_cnt": {
+        "lineage": [""],
+
+        "count_data": {}
+      },
+
+      "appid": {
+        "lineage": [""],
+
+        "count_data": {}
+      }
+    }
+  },
+
+  "biwarehouse.dw_hiapp_gift_summary_stat_dm": {
+    "tables": ["temp.tmp_dw_hiapp_gift_summary_stat_dm_2_20251001"],
+
+    "sql": "SELECT country_id,campaign_id,campaign_name,draw_users,draw_cnt,draw_others,download_users,download_cnt,award_ids,award_name,0 AS award_count,0 AS award_remain,appid,appname,hms_flg FROM temp.tmp_dw_hiapp_gift_summary_stat_dm_2_20251001 UNION ALL SELECT country_id,campaign_id,campaign_name,SUM(draw_users) AS draw_users,SUM(draw_cnt) AS draw_cnt,SUM(draw_others) AS draw_others,SUM(download_users) AS download_users,SUM(download_cnt) AS download_cnt,award_ids,award_name,MAX(award_count),MAX(award_remain),appid,appname,'ALL' AS hms_flg FROM temp.tmp_dw_hiapp_gift_summary_stat_dm_2_20251001 GROUP BY country_id,campaign_id,campaign_name,award_ids,award_name,appid,appname",
+
+    "columns": {
+      "country_id": {
+        "lineage": [
+          "temp.tmp_dw_hiapp_gift_summary_stat_dm_2_20251001.country_id"
+        ],
+
+        "count_data": {}
+      },
+
+      "campaign_id": {
+        "lineage": [
+          "temp.tmp_dw_hiapp_gift_summary_stat_dm_2_20251001.campaign_id"
+        ],
+
+        "count_data": {}
+      },
+
+      "campaign_name": {
+        "lineage": [
+          "temp.tmp_dw_hiapp_gift_summary_stat_dm_2_20251001.campaign_name"
+        ],
+
+        "count_data": {}
+      },
+
+      "draw_users": {
+        "lineage": [
+          "temp.tmp_dw_hiapp_gift_summary_stat_dm_2_20251001.draw_users"
+        ],
+
+        "count_data": {}
+      },
+
+      "draw_cnt": {
+        "lineage": [
+          "temp.tmp_dw_hiapp_gift_summary_stat_dm_2_20251001.draw_cnt"
+        ],
+
+        "count_data": {}
+      },
+
+      "draw_others": {
+        "lineage": [
+          "temp.tmp_dw_hiapp_gift_summary_stat_dm_2_20251001.draw_others"
+        ],
+
+        "count_data": {}
+      },
+
+      "download_users": {
+        "lineage": [
+          "temp.tmp_dw_hiapp_gift_summary_stat_dm_2_20251001.download_users"
+        ],
+
+        "count_data": {}
+      },
+
+      "download_cnt": {
+        "lineage": [
+          "temp.tmp_dw_hiapp_gift_summary_stat_dm_2_20251001.download_cnt"
+        ],
+
+        "count_data": {}
+      },
+
+      "award_ids": {
+        "lineage": [
+          "temp.tmp_dw_hiapp_gift_summary_stat_dm_2_20251001.award_ids"
+        ],
+
+        "count_data": {}
+      },
+
+      "award_name": {
+        "lineage": [
+          "temp.tmp_dw_hiapp_gift_summary_stat_dm_2_20251001.award_name"
+        ],
+
+        "count_data": {}
+      },
+
+      "award_count": {
+        "lineage": [],
+
+        "count_data": {}
+      },
+
+      "award_remain": {
+        "lineage": [],
+
+        "count_data": {}
+      },
+
+      "appid": {
+        "lineage": ["temp.tmp_dw_hiapp_gift_summary_stat_dm_2_20251001.appid"],
+
+        "count_data": {}
+      },
+
+      "appname": {
+        "lineage": [
+          "temp.tmp_dw_hiapp_gift_summary_stat_dm_2_20251001.appname"
+        ],
+
+        "count_data": {}
+      },
+
+      "hms_flg": {
+        "lineage": [
+          "temp.tmp_dw_hiapp_gift_summary_stat_dm_2_20251001.hms_flg"
+        ],
+
+        "count_data": {}
+      }
+    }
+  },
+
+  "biads.ads_hispace_gift_summary_stat_dm": {
+    "tables": [
+      "bicoredata.dwd_common_loc_country_ds",
+
+      "biwarehouse.dw_hiapp_gift_summary_stat_dm"
+    ],
+
+    "sql": "SELECT country_id,campaign_id,campaign_name,draw_users,draw_cnt,draw_others,download_users,download_cnt,award_ids,award_name,award_count,award_remain,appid,appname,hms_flg FROM ( SELECT country_id,campaign_id,campaign_name,draw_users,draw_cnt,draw_others,download_users,download_cnt,award_ids,award_name,award_count,award_remain,appid,appname,hms_flg FROM biwarehouse.dw_hiapp_gift_summary_stat_dm WHERE pt_d='20251011' AND length(award_ids) <= 128 ) t1 INNER JOIN ( SELECT hiapp_country_cd FROM bicoredata.dwd_common_loc_country_ds WHERE omsite_cd = '$OM_SITE_CD' ) t2 ON t1.country_id = t2.hiapp_country_cd",
+
+    "columns": {
+      "country_id": {
+        "lineage": ["biwarehouse.dw_hiapp_gift_summary_stat_dm.country_id"],
+
+        "count_data": {
+          "20251101": 1.0,
+
+          "20251102": 1.0,
+
+          "20251103": 1.0,
+
+          "20251104": 1.0,
+
+          "20251105": 1.0,
+
+          "20251106": 1.0,
+
+          "20251107": 1.0,
+
+          "20251108": 1.0,
+
+          "20251109": 1.0,
+
+          "20251110": 1.0,
+
+          "20251111": 1.0,
+
+          "20251112": 1.0,
+
+          "20251113": 1.0
+        }
+      },
+
+      "campaign_id": {
+        "lineage": ["biwarehouse.dw_hiapp_gift_summary_stat_dm.campaign_id"],
+
+        "count_data": {
+          "20251101": 1.0,
+
+          "20251102": 1.0,
+
+          "20251103": 1.0,
+
+          "20251104": 1.0,
+
+          "20251105": 1.0,
+
+          "20251106": 1.0,
+
+          "20251107": 1.0,
+
+          "20251108": 1.0,
+
+          "20251109": 1.0,
+
+          "20251110": 1.0,
+
+          "20251111": 1.0,
+
+          "20251112": 1.0,
+
+          "20251113": 1.0
+        }
+      },
+
+      "campaign_name": {
+        "lineage": ["biwarehouse.dw_hiapp_gift_summary_stat_dm.campaign_name"],
+
+        "count_data": {
+          "20251101": 1.0,
+
+          "20251102": 1.0,
+
+          "20251103": 1.0,
+
+          "20251104": 1.0,
+
+          "20251105": 1.0,
+
+          "20251106": 1.0,
+
+          "20251107": 1.0,
+
+          "20251108": 1.0,
+
+          "20251109": 1.0,
+
+          "20251110": 1.0,
+
+          "20251111": 1.0,
+
+          "20251112": 1.0,
+
+          "20251113": 1.0
+        }
+      },
+
+      "draw_users": {
+        "lineage": ["biwarehouse.dw_hiapp_gift_summary_stat_dm.draw_users"],
+
+        "count_data": {
+          "20251101": 3390.0,
+
+          "20251102": 2954.0,
+
+          "20251103": 2912.0,
+
+          "20251104": 2758.0,
+
+          "20251105": 2328.0,
+
+          "20251106": 2012.0,
+
+          "20251107": 2660.0,
+
+          "20251108": 2860.0,
+
+          "20251109": 2328.0,
+
+          "20251110": 2690.0,
+
+          "20251111": 3722.0,
+
+          "20251112": 2530.0,
+
+          "20251113": 2134.0
+        }
+      },
+
+      "draw_cnt": {
+        "lineage": ["biwarehouse.dw_hiapp_gift_summary_stat_dm.draw_cnt"],
+
+        "count_data": {
+          "20251101": 16634.0,
+
+          "20251102": 9628.0,
+
+          "20251103": 8856.0,
+
+          "20251104": 7626.0,
+
+          "20251105": 8454.0,
+
+          "20251106": 8440.0,
+
+          "20251107": 7816.0,
+
+          "20251108": 8084.0,
+
+          "20251109": 6670.0,
+
+          "20251110": 6408.0,
+
+          "20251111": 12306.0,
+
+          "20251112": 8512.0,
+
+          "20251113": 14944.0
+        }
+      },
+
+      "draw_others": {
+        "lineage": ["biwarehouse.dw_hiapp_gift_summary_stat_dm.draw_others"],
+
+        "count_data": {
+          "20251101": 278.0,
+
+          "20251102": 248.0,
+
+          "20251103": 224.0,
+
+          "20251104": 146.0,
+
+          "20251105": 186.0,
+
+          "20251106": 204.0,
+
+          "20251107": 230.0,
+
+          "20251108": 162.0,
+
+          "20251109": 148.0,
+
+          "20251110": 176.0,
+
+          "20251111": 178.0,
+
+          "20251112": 144.0,
+
+          "20251113": 122.0
+        }
+      },
+
+      "download_users": {
+        "lineage": ["biwarehouse.dw_hiapp_gift_summary_stat_dm.download_users"],
+
+        "count_data": {
+          "20251101": 272.0,
+
+          "20251102": 260.0,
+
+          "20251103": 218.0,
+
+          "20251104": 260.0,
+
+          "20251105": 222.0,
+
+          "20251106": 230.0,
+
+          "20251107": 174.0,
+
+          "20251108": 158.0,
+
+          "20251109": 130.0,
+
+          "20251110": 664.0,
+
+          "20251111": 386.0,
+
+          "20251112": 200.0,
+
+          "20251113": 156.0
+        }
+      },
+
+      "download_cnt": {
+        "lineage": ["biwarehouse.dw_hiapp_gift_summary_stat_dm.download_cnt"],
+
+        "count_data": {
+          "20251101": 276.0,
+
+          "20251102": 280.0,
+
+          "20251103": 218.0,
+
+          "20251104": 270.0,
+
+          "20251105": 222.0,
+
+          "20251106": 232.0,
+
+          "20251107": 184.0,
+
+          "20251108": 164.0,
+
+          "20251109": 136.0,
+
+          "20251110": 672.0,
+
+          "20251111": 404.0,
+
+          "20251112": 204.0,
+
+          "20251113": 156.0
+        }
+      },
+
+      "award_ids": {
+        "lineage": ["biwarehouse.dw_hiapp_gift_summary_stat_dm.award_ids"],
+
+        "count_data": {
+          "20251101": 1.0,
+
+          "20251102": 1.0,
+
+          "20251103": 1.0,
+
+          "20251104": 1.0,
+
+          "20251105": 1.0,
+
+          "20251106": 1.0,
+
+          "20251107": 1.0,
+
+          "20251108": 1.0,
+
+          "20251109": 1.0,
+
+          "20251110": 1.0,
+
+          "20251111": 1.0,
+
+          "20251112": 1.0,
+
+          "20251113": 1.0
+        }
+      },
+
+      "award_name": {
+        "lineage": ["biwarehouse.dw_hiapp_gift_summary_stat_dm.award_name"],
+
+        "count_data": {
+          "20251101": 1.0,
+
+          "20251102": 1.0,
+
+          "20251103": 1.0,
+
+          "20251104": 1.0,
+
+          "20251105": 1.0,
+
+          "20251106": 1.0,
+
+          "20251107": 1.0,
+
+          "20251108": 1.0,
+
+          "20251109": 1.0,
+
+          "20251110": 1.0,
+
+          "20251111": 1.0,
+
+          "20251112": 1.0,
+
+          "20251113": 1.0
+        }
+      },
+
+      "award_count": {
+        "lineage": ["biwarehouse.dw_hiapp_gift_summary_stat_dm.award_count"],
+
+        "count_data": {
+          "20251101": 614967.0,
+
+          "20251102": 745860.0,
+
+          "20251103": 910296.0,
+
+          "20251104": 615835.0,
+
+          "20251105": 906908.0,
+
+          "20251106": 861013.0,
+
+          "20251107": 870500.0,
+
+          "20251108": 789487.0,
+
+          "20251109": 378893.0,
+
+          "20251110": 1082465.0,
+
+          "20251111": 876192.0,
+
+          "20251112": 671842.0,
+
+          "20251113": 673418.0
+        }
+      },
+
+      "award_remain": {
+        "lineage": ["biwarehouse.dw_hiapp_gift_summary_stat_dm.award_remain"],
+
+        "count_data": {
+          "20251101": 432376.0,
+
+          "20251102": 504871.0,
+
+          "20251103": 670469.0,
+
+          "20251104": 326305.0,
+
+          "20251105": 613788.0,
+
+          "20251106": 567581.0,
+
+          "20251107": 723107.0,
+
+          "20251108": 623955.0,
+
+          "20251109": 264272.0,
+
+          "20251110": 719641.0,
+
+          "20251111": 564469.0,
+
+          "20251112": 515316.0,
+
+          "20251113": 548127.0
+        }
+      },
+
+      "appid": {
+        "lineage": ["biwarehouse.dw_hiapp_gift_summary_stat_dm.appid"],
+
+        "count_data": {
+          "20251101": 1.0,
+
+          "20251102": 1.0,
+
+          "20251103": 1.0,
+
+          "20251104": 1.0,
+
+          "20251105": 1.0,
+
+          "20251106": 1.0,
+
+          "20251107": 1.0,
+
+          "20251108": 1.0,
+
+          "20251109": 1.0,
+
+          "20251110": 1.0,
+
+          "20251111": 1.0,
+
+          "20251112": 1.0,
+
+          "20251113": 1.0
+        }
+      },
+
+      "appname": {
+        "lineage": ["biwarehouse.dw_hiapp_gift_summary_stat_dm.appname"],
+
+        "count_data": {
+          "20251101": 1.0,
+
+          "20251102": 1.0,
+
+          "20251103": 1.0,
+
+          "20251104": 1.0,
+
+          "20251105": 1.0,
+
+          "20251106": 1.0,
+
+          "20251107": 1.0,
+
+          "20251108": 1.0,
+
+          "20251109": 1.0,
+
+          "20251110": 1.0,
+
+          "20251111": 1.0,
+
+          "20251112": 1.0,
+
+          "20251113": 1.0
+        }
+      },
+
+      "hms_flg": {
+        "lineage": ["biwarehouse.dw_hiapp_gift_summary_stat_dm.hms_flg"],
+
+        "count_data": {
+          "20251101": 1.0,
+
+          "20251102": 1.0,
+
+          "20251103": 1.0,
+
+          "20251104": 1.0,
+
+          "20251105": 1.0,
+
+          "20251106": 1.0,
+
+          "20251107": 1.0,
+
+          "20251108": 1.0,
+
+          "20251109": 1.0,
+
+          "20251110": 1.0,
+
+          "20251111": 1.0,
+
+          "20251112": 1.0,
+
+          "20251113": 1.0
+        }
+      }
+    }
+  }
+}

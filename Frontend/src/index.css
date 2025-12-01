@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.column-row.highlight {
+  @apply bg-indigo-50;
+}
+
+.column-row.dimmed {
+  @apply opacity-40;
+}

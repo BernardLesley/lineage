@@ -6,7 +6,7 @@ const apiUrl = (path: string) =>
   API_BASE_URL ? `${API_BASE_URL}${path}` : path;
 
 export async function getLineage(): Promise<RawLineage> {
-  const res = await fetch(apiUrl("/api/v1/lineage/outPOST"));
+  const res = await fetch(apiUrl("/api/v1/lineage/output"));
   if (!res.ok) {
     throw new Error(`Failed to fetch lineage: ${res.status} ${res.statusText}`);
   }
@@ -32,10 +32,11 @@ export async function fetchLineageWithFallback(): Promise<RawLineage> {
     return await getLineage();
   } catch (apiError) {
     try {
-      const res = await fetch("/outPOST.json");
+      // FIX: fallback should match your built/static filename (recommended: output.json)
+      const res = await fetch("/output.json");
       if (!res.ok) {
         throw new Error(
-          `Failed to fetch fallback outPOST.json: ${res.status} ${res.statusText}`
+          `Failed to fetch fallback output.json: ${res.status} ${res.statusText}`
         );
       }
       return res.json();
@@ -51,6 +52,7 @@ export async function fetchLineageWithFallback(): Promise<RawLineage> {
 
 export async function uploadLogs(logs: string): Promise<void> {
   const logsB64 = btoa(unescape(encodeURIComponent(logs)));
+
   const res = await fetch(apiUrl("/api/v1/lineage/logs"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -108,9 +110,7 @@ export async function upsertTableMetadata(
 export async function deleteTableMetadata(name: string): Promise<void> {
   const res = await fetch(
     apiUrl(`/api/v1/metadata/tables/${encodeURIComponent(name)}`),
-    {
-      method: "DELETE",
-    }
+    { method: "DELETE" }
   );
 
   if (!res.ok) {
@@ -150,9 +150,7 @@ export async function upsertDashboardMetadata(
 export async function deleteDashboardMetadata(name: string): Promise<void> {
   const res = await fetch(
     apiUrl(`/api/v1/metadata/dashboards/${encodeURIComponent(name)}`),
-    {
-      method: "DELETE",
-    }
+    { method: "DELETE" }
   );
 
   if (!res.ok) {

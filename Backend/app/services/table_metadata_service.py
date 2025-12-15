@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from app.config.config import config
 from app.schemas.metadata import TableMetadata, TableMetadataUpdate
@@ -28,6 +28,18 @@ def _write_table_metadata_file(path: Path, items: List[TableMetadata]) -> None:
 
 def list_tables() -> List[TableMetadata]:
     return _read_table_metadata_file(config.TABLE_METADATA_FILE)
+
+
+def build_input_table_dict() -> Dict[str, List[str]]:
+    """
+    Convert stored TableMetadata into the mapping expected by lineagex:
+    { "table_name": ["col1", "col2", ...], ... }
+    """
+    tables = list_tables()
+    out: Dict[str, List[str]] = {}
+    for t in tables:
+        out[t.name] = [c.name for c in (t.columns or []) if c.name]
+    return out
 
 
 def get_table(table_name: str) -> Optional[TableMetadata]:

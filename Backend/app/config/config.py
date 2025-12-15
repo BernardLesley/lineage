@@ -9,6 +9,7 @@ class Config(BaseSettings):
     LINEAGE_FILE: Path = DATA_DIR / "lineage.json"
     TABLE_METADATA_FILE: Path = DATA_DIR / "table_metadata.json"
     DASHBOARD_METADATA_FILE: Path = DATA_DIR / "dashboard_metadata.json"
+    MONITOR_TABLE: str = "biads.ads_hispace_data_monitor"
     DEBUG: bool = True
 
     class Config:

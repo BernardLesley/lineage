@@ -26,7 +26,7 @@ def _read_json(path: Path) -> Dict[str, Any]:
 
     text = path.read_text(encoding="utf-8").strip()
     if not text:
-        return {}
+        raise FileNotFoundError(f"Lineage output is empty: {path}")
 
     return cast(Dict[str, Any], json.loads(text))
 
@@ -40,15 +40,9 @@ def _atomic_write_json(path: Path, data: Dict[str, Any]) -> None:
     os.replace(tmp_path, path)
 
 
-def _write_json(path: Path, data: Any) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-
-
 def get_lineage_output() -> LineageData:
     raw = _read_json(_get_lineage_file())
-    return cast(LineageData, raw)
+    return LineageData(data=raw)
 
 
 def _strip_leading_line_comment(line: str) -> str:
@@ -257,7 +251,7 @@ def build_lineage_from_zip(zip_bytes: bytes) -> None:
         input_table_dict=input_table_dict,
     )
 
-    _write_json(_get_lineage_file(), output)
+    _atomic_write_json(_get_lineage_file(), output)
 
 
 def ingest_logs(logs_b64: str) -> None:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
@@ -13,8 +13,8 @@ class SqlToDict:
     path: Union[List[str], str]
     dialect: str = "spark"
 
-    sql_files_dict: Dict[str, str] = {}
-    org_sql_files_dict: Dict[str, str] = {}
+    sql_files_dict: Dict[str, str] = field(default_factory=dict)
+    org_sql_files_dict: Dict[str, str] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         self.sql_files_dict = {}

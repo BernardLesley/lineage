@@ -7,7 +7,7 @@ import {
   ReactNode,
 } from "react";
 import { RawLineage } from "../types";
-import { fetchLineageWithFallback } from "../lib/api";
+import { fetchLineage } from "../lib/api";
 
 type LineageContextValue = {
   rawData: RawLineage | null;
@@ -38,7 +38,7 @@ export const LineageProvider = ({ children }: LineageProviderProps) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchLineageWithFallback();
+      const data = await fetchLineage();
       setRawDataState(data);
     } catch (e) {
       setError((e as Error).message);

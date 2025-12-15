@@ -27,27 +27,8 @@ export async function uploadZip(file: File): Promise<void> {
   }
 }
 
-export async function fetchLineageWithFallback(): Promise<RawLineage> {
-  try {
-    return await getLineage();
-  } catch (apiError) {
-    try {
-      // FIX: fallback should match your built/static filename (recommended: output.json)
-      const res = await fetch("/output.json");
-      if (!res.ok) {
-        throw new Error(
-          `Failed to fetch fallback output.json: ${res.status} ${res.statusText}`
-        );
-      }
-      return res.json();
-    } catch (fallbackError) {
-      throw new Error(
-        `Failed to fetch lineage from API and fallback: ${
-          (apiError as Error).message
-        } | ${(fallbackError as Error).message}`
-      );
-    }
-  }
+export async function fetchLineage(): Promise<RawLineage> {
+  return await getLineage();
 }
 
 export async function uploadLogs(logs: string): Promise<void> {

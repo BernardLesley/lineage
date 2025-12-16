@@ -44,16 +44,20 @@ const SqlDialog: FC<SqlDialogProps> = ({ open, table, sql, onOpenChange }) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl bg-white p-0">
+      <DialogContent className="sm:max-w-4xl bg-white p-0 overflow-hidden">
         <DialogHeader className="px-6 pt-6">
           <DialogTitle>SQL – {table}</DialogTitle>
         </DialogHeader>
 
         <div className="px-6 pb-6 pt-4">
           <ScrollArea className="h-[60vh] max-h-[520px] w-full rounded-md border bg-white">
-            <pre className="whitespace-pre rounded-md bg-slate-50 p-4 text-xs font-mono text-slate-900">
-              {formatted}
-            </pre>
+            <div className="min-w-max">
+              <pre className="whitespace-pre rounded-md bg-slate-50 p-4 text-xs font-mono text-slate-900">
+                {formatted}
+              </pre>
+            </div>
+
+            <ScrollBar orientation="vertical" />
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
         </div>

@@ -44,7 +44,7 @@ const SqlDialog: FC<SqlDialogProps> = ({ open, table, sql, onOpenChange }) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[min(92vw,56rem)] max-w-none bg-white p-0">
+      <DialogContent className="max-w-4xl bg-white p-0">
         <DialogHeader className="px-6 pt-6">
           <DialogTitle>SQL – {table}</DialogTitle>
         </DialogHeader>

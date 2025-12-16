@@ -1,8 +1,8 @@
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import { format as formatSql } from "sql-formatter";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import { ScrollArea } from "../ui/scroll-area";
+import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 
 type SqlDialogProps = {
   open: boolean;
@@ -11,17 +11,51 @@ type SqlDialogProps = {
   onOpenChange: (open: boolean) => void;
 };
 
+const escapeSparkVars = (s: string) =>
+  s
+    .replace(
+      /\$\{[^}]+\}/g,
+      (m) => `__SPARK_VAR_BRACE__${encodeURIComponent(m)}__`
+    )
+    .replace(
+      /\$[A-Za-z_][A-Za-z0-9_]*/g,
+      (m) => `__SPARK_VAR__${encodeURIComponent(m)}__`
+    );
+
+const unescapeSparkVars = (s: string) =>
+  s
+    .replace(/__SPARK_VAR_BRACE__([^_]+)__/g, (_, enc) =>
+      decodeURIComponent(enc)
+    )
+    .replace(/__SPARK_VAR__([^_]+)__/g, (_, enc) => decodeURIComponent(enc));
+
+const safeFormatSpark = (raw: string) => {
+  try {
+    const escaped = escapeSparkVars(raw);
+    const formatted = formatSql(escaped, {
+      language: "spark",
+    });
+    return unescapeSparkVars(formatted);
+  } catch {
+    return raw;
+  }
+};
+
 const SqlDialog: FC<SqlDialogProps> = ({ open, table, sql, onOpenChange }) => {
+  const formatted = useMemo(() => safeFormatSpark(sql), [sql]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl bg-white">
         <DialogHeader>
           <DialogTitle>SQL – {table}</DialogTitle>
         </DialogHeader>
-        <ScrollArea className="h-[400px] mt-4 rounded-md border bg-white">
-          <pre className="bg-slate-50 text-slate-900 p-4 text-xs rounded-md font-mono whitespace-pre">
-            {formatSql(sql)}
+
+        <ScrollArea className="mt-4 h-[400px] rounded-md border bg-white">
+          <pre className="min-w-max whitespace-pre rounded-md bg-slate-50 p-4 text-xs font-mono text-slate-900">
+            {formatted}
           </pre>
+          <ScrollBar orientation="horizontal" />
         </ScrollArea>
       </DialogContent>
     </Dialog>

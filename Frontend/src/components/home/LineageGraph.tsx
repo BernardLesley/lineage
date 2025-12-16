@@ -1,10 +1,20 @@
 import { FC } from "react";
-import ReactFlow, { Controls, MiniMap, type Node, type Edge } from "reactflow";
+import ReactFlow, {
+  Controls,
+  MiniMap,
+  type Node,
+  type Edge,
+  MarkerType,
+} from "reactflow";
 import "reactflow/dist/style.css";
 
 import TableNode from "./TableNode";
+import DashboardNode from "./DashboardNode";
 
-const nodeTypes = { tableNode: TableNode };
+const nodeTypes = {
+  tableNode: TableNode,
+  dashboardNode: DashboardNode,
+};
 
 type LineageGraphProps = {
   nodes: Node[];
@@ -22,7 +32,16 @@ const LineageGraph: FC<LineageGraphProps> = ({ nodes, edges, isLoading }) => {
   }
 
   return (
-    <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeTypes} fitView>
+    <ReactFlow
+      nodes={nodes}
+      edges={edges}
+      nodeTypes={nodeTypes}
+      fitView
+      defaultEdgeOptions={{
+        type: "smoothstep",
+        markerEnd: { type: MarkerType.ArrowClosed },
+      }}
+    >
       <MiniMap pannable zoomable />
       <Controls />
     </ReactFlow>

@@ -3,6 +3,7 @@ import { FC, useMemo, useState, useEffect, useCallback } from "react";
 import { buildGraph, bfsUp, bfsDown } from "../lib/lineageGraph";
 import { useLineage } from "../context/LineageContext";
 import { useThreshold } from "../context/ThresholdContext";
+import { useMetadata } from "../context/MetadataContext";
 
 import LineageGraph from "../components/home/LineageGraph";
 import SqlDialog from "../components/home/SqlDialog";
@@ -16,6 +17,7 @@ import { uploadZip, uploadLogs } from "../lib/api";
 const Home: FC = () => {
   const { rawData, loading, refresh } = useLineage();
   const { thresholdPct } = useThreshold();
+  const { dashboards } = useMetadata();
 
   const [uploadOpen, setUploadOpen] = useState(false);
   const [logsOpen, setLogsOpen] = useState(false);
@@ -29,8 +31,8 @@ const Home: FC = () => {
   const baseGraph = useMemo(() => {
     if (!rawData) return null;
     if (Object.keys(rawData).length === 0) return null;
-    return buildGraph(rawData);
-  }, [rawData]);
+    return buildGraph(rawData, dashboards as any);
+  }, [rawData, dashboards]);
 
   const graph = useMemo(() => {
     if (!baseGraph) return null;
@@ -42,40 +44,69 @@ const Home: FC = () => {
       (c) => `${selectedTable}.${c}`
     );
 
-    const visited = new Set<string>();
+    const visitedCols = new Set<string>();
     const stack = [...cols];
 
     while (stack.length) {
       const key = stack.pop() as string;
-      if (visited.has(key)) continue;
-      visited.add(key);
+      if (visitedCols.has(key)) continue;
+      visitedCols.add(key);
       const parents = baseGraph.reverseAdj[key] || [];
       for (const p of parents) {
-        if (!visited.has(p)) stack.push(p);
+        if (!visitedCols.has(p)) stack.push(p);
       }
     }
 
     const activeTables = new Set<string>();
-    visited.forEach((k) => {
+    visitedCols.forEach((k) => {
       const idx = k.lastIndexOf(".");
-      if (idx !== -1) {
-        activeTables.add(k.slice(0, idx));
-      }
+      if (idx !== -1) activeTables.add(k.slice(0, idx));
     });
 
-    const nodes = baseGraph.nodes.filter((n) =>
-      activeTables.has(n.data.tableName)
-    );
+    const dashboardNodes = new Set<string>();
+    baseGraph.edges.forEach((e) => {
+      const kind = baseGraph.edgeKinds[e.id];
+      if (kind !== "dashboard") return;
+
+      const sourceIsDash = String(e.source).startsWith("dashboard:");
+      const targetIsDash = String(e.target).startsWith("dashboard:");
+
+      if (sourceIsDash && activeTables.has(String(e.target)))
+        dashboardNodes.add(String(e.source));
+      if (targetIsDash && activeTables.has(String(e.source)))
+        dashboardNodes.add(String(e.target));
+    });
+
+    const nodes = baseGraph.nodes.filter((n) => {
+      if (n.type === "dashboardNode") return dashboardNodes.has(n.id);
+      return activeTables.has((n.data as any).tableName);
+    });
 
     const edges = baseGraph.edges.filter((e) => {
+      const kind = baseGraph.edgeKinds[e.id];
+
+      if (kind === "dashboard") {
+        const sOk =
+          dashboardNodes.has(String(e.source)) ||
+          activeTables.has(String(e.source));
+        const tOk =
+          dashboardNodes.has(String(e.target)) ||
+          activeTables.has(String(e.target));
+        return sOk && tOk;
+      }
+
       const meta = baseGraph.edgeColKeys[e.id];
       if (!meta) return false;
-      return visited.has(meta.sourceKey) && visited.has(meta.targetKey);
+      return visitedCols.has(meta.sourceKey) && visitedCols.has(meta.targetKey);
     });
 
     const edgeColKeys: typeof baseGraph.edgeColKeys = {};
+    const edgeKinds: typeof baseGraph.edgeKinds = {};
+
     edges.forEach((e) => {
-      edgeColKeys[e.id] = baseGraph.edgeColKeys[e.id];
+      edgeKinds[e.id] = baseGraph.edgeKinds[e.id];
+      if (baseGraph.edgeColKeys[e.id])
+        edgeColKeys[e.id] = baseGraph.edgeColKeys[e.id];
     });
 
     return {
@@ -83,6 +114,7 @@ const Home: FC = () => {
       nodes,
       edges,
       edgeColKeys,
+      edgeKinds,
     };
   }, [baseGraph, selectedTable, rawData]);
 
@@ -101,7 +133,11 @@ const Home: FC = () => {
     open: boolean;
     table: string;
     sql: string;
-  }>({ open: false, table: "", sql: "" });
+  }>({
+    open: false,
+    table: "",
+    sql: "",
+  });
 
   const [colPopover, setColPopover] = useState<{
     fullKey: string;
@@ -127,11 +163,7 @@ const Home: FC = () => {
   const handleSqlClick = useCallback(
     (table: string) => {
       if (!rawData) return;
-      setSqlDialog({
-        open: true,
-        table,
-        sql: rawData[table].sql,
-      });
+      setSqlDialog({ open: true, table, sql: rawData[table].sql });
     },
     [rawData]
   );
@@ -197,20 +229,24 @@ const Home: FC = () => {
 
   const enrichedNodes = useMemo(() => {
     if (!graph) return [];
-    return graph.nodes.map((n) => ({
-      ...n,
-      data: {
-        ...n.data,
-        columns: n.data.columns.map((col: { fullKey: string }) => ({
-          ...col,
-          hasAlert: alertColumns.has(col.fullKey),
-        })),
-        onColumnHover: handleColumnHover,
-        onColumnLeave: handleColumnLeave,
-        onSqlClick: handleSqlClick,
-        onColumnClick: handleColumnClick,
-      },
-    }));
+    return graph.nodes.map((n) => {
+      if (n.type !== "tableNode") return n;
+
+      return {
+        ...n,
+        data: {
+          ...(n.data as any),
+          columns: (n.data as any).columns.map((col: any) => ({
+            ...col,
+            hasAlert: alertColumns.has(col.fullKey),
+          })),
+          onColumnHover: handleColumnHover,
+          onColumnLeave: handleColumnLeave,
+          onSqlClick: handleSqlClick,
+          onColumnClick: handleColumnClick,
+        },
+      };
+    });
   }, [
     graph,
     alertColumns,
@@ -223,11 +259,17 @@ const Home: FC = () => {
   const enrichedEdges = useMemo(() => {
     if (!graph) return [];
     if (!hoverCol) return graph.edges;
+
     return graph.edges.map((e) => {
+      const kind = graph.edgeKinds[e.id];
+      if (kind !== "col") return e;
+
       const meta = graph.edgeColKeys[e.id];
       const active =
-        connectedCols.includes(meta?.sourceKey) &&
-        connectedCols.includes(meta?.targetKey);
+        !!meta &&
+        connectedCols.includes(meta.sourceKey) &&
+        connectedCols.includes(meta.targetKey);
+
       return {
         ...e,
         style: {

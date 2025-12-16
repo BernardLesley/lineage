@@ -46,13 +46,15 @@ const SqlPreviewDialog: FC<SqlPreviewDialogProps> = ({
         </DialogHeader>
 
         <div className="mt-3 rounded-md border border-slate-200 bg-slate-950/[0.02]">
-          <div className="flex items-center gap-2 border-b border-slate-200 px-3 py-1.5 text-[11px] font-mono text-slate-700 bg-slate-50">
+          <div className="flex items-center gap-2 border-b border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] font-mono text-slate-700">
             <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
             <span>sql&gt; generated script</span>
           </div>
-          <pre className="block h-64 w-full overflow-auto bg-transparent px-3 py-2 text-xs font-mono text-slate-800 whitespace-pre">
-            {sql}
-          </pre>
+          <div className="h-64 w-full overflow-auto">
+            <pre className="min-w-max whitespace-pre bg-transparent px-3 py-2 text-xs font-mono text-slate-800">
+              {sql}
+            </pre>
+          </div>
         </div>
 
         <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500">

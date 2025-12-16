@@ -26,10 +26,19 @@ export type TableNodeData = {
   onColumnClick?: (fullKey: string) => void;
 };
 
+export type DashboardNodeData = {
+  dashboardName: string;
+};
+
+export type FlowNodeData = TableNodeData | DashboardNodeData;
+
+export type EdgeKind = "col" | "dashboard";
+
 export type BuildResult = {
-  nodes: import("@reactflow/core").Node<TableNodeData>[];
+  nodes: import("@reactflow/core").Node<FlowNodeData>[];
   edges: import("@reactflow/core").Edge[];
   reverseAdj: Record<string, string[]>;
   forwardAdj: Record<string, string[]>;
   edgeColKeys: Record<string, { sourceKey: string; targetKey: string }>;
+  edgeKinds: Record<string, EdgeKind>;
 };

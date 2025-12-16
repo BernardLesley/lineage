@@ -15,7 +15,7 @@ const TableNode: FC<NodeProps<TableNodeData>> = ({ data }) => {
 
   return (
     <div className="border border-gray-200 bg-white rounded-lg w-[220px] overflow-hidden shadow-sm text-[11px]">
-      <div className="bg-black text-white px-3 py-2 font-semibold text-[11px] grid grid-cols-[1fr_auto] items-center">
+      <div className="bg-black text-white px-3 py-2 font-semibold text-[11px] grid grid-cols-[1fr_auto] items-center gap-2">
         <span
           className="whitespace-nowrap overflow-hidden text-ellipsis"
           title={tableName}

@@ -37,7 +37,7 @@ const SqlPreviewDialog: FC<SqlPreviewDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[min(92vw,56rem)] max-w-none bg-white p-0">
+      <DialogContent className="w-[min(92vw,56rem)] sm:max-w-none bg-white p-0">
         <DialogHeader className="px-6 pt-6">
           <DialogTitle className="text-sm">{title}</DialogTitle>
           <DialogDescription className="text-xs text-slate-500">
@@ -52,7 +52,7 @@ const SqlPreviewDialog: FC<SqlPreviewDialogProps> = ({
               <span>sql&gt; generated script</span>
             </div>
 
-            <div className="h-[60vh] max-h-[420px] w-full overflow-auto">
+            <div className="h-[60vh] max-h-[420px] overflow-auto">
               <pre className="w-max min-w-full whitespace-pre bg-transparent px-3 py-2 text-xs font-mono text-slate-800">
                 {sql}
               </pre>

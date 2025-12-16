@@ -51,7 +51,7 @@ const SqlDialog: FC<SqlDialogProps> = ({ open, table, sql, onOpenChange }) => {
 
         <div className="px-6 pb-6 pt-4">
           <ScrollArea className="h-[60vh] max-h-[520px] w-full rounded-md border bg-white">
-            <pre className="w-max min-w-full whitespace-pre rounded-md bg-slate-50 p-4 text-xs font-mono text-slate-900">
+            <pre className="whitespace-pre rounded-md bg-slate-50 p-4 text-xs font-mono text-slate-900">
               {formatted}
             </pre>
             <ScrollBar orientation="horizontal" />

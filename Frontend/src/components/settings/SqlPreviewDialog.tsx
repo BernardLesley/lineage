@@ -37,46 +37,49 @@ const SqlPreviewDialog: FC<SqlPreviewDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl bg-white">
-        <DialogHeader>
+      <DialogContent className="w-[min(92vw,56rem)] max-w-none bg-white p-0">
+        <DialogHeader className="px-6 pt-6">
           <DialogTitle className="text-sm">{title}</DialogTitle>
           <DialogDescription className="text-xs text-slate-500">
             Review and copy the generated SQL snippet.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="mt-3 rounded-md border border-slate-200 bg-slate-950/[0.02]">
-          <div className="flex items-center gap-2 border-b border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] font-mono text-slate-700">
-            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
-            <span>sql&gt; generated script</span>
-          </div>
-          <div className="h-64 w-full overflow-auto">
-            <pre className="min-w-max whitespace-pre bg-transparent px-3 py-2 text-xs font-mono text-slate-800">
-              {sql}
-            </pre>
-          </div>
-        </div>
+        <div className="px-6 pb-6 pt-4">
+          <div className="rounded-md border border-slate-200 bg-slate-950/[0.02]">
+            <div className="flex items-center gap-2 border-b border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] font-mono text-slate-700">
+              <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+              <span>sql&gt; generated script</span>
+            </div>
 
-        <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500">
-          <span>{sql.length.toLocaleString()} chars</span>
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="text-xs"
-              onClick={() => onOpenChange(false)}
-            >
-              Close
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              className="bg-black text-white hover:bg-slate-900 text-xs"
-              onClick={handleCopy}
-            >
-              {copied ? "Copied!" : "Copy SQL"}
-            </Button>
+            <div className="h-[60vh] max-h-[420px] w-full overflow-auto">
+              <pre className="w-max min-w-full whitespace-pre bg-transparent px-3 py-2 text-xs font-mono text-slate-800">
+                {sql}
+              </pre>
+            </div>
+          </div>
+
+          <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500">
+            <span>{sql.length.toLocaleString()} chars</span>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="text-xs"
+                onClick={() => onOpenChange(false)}
+              >
+                Close
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                className="bg-black text-white hover:bg-slate-900 text-xs"
+                onClick={handleCopy}
+              >
+                {copied ? "Copied!" : "Copy SQL"}
+              </Button>
+            </div>
           </div>
         </div>
       </DialogContent>

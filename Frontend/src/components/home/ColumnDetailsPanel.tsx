@@ -19,11 +19,30 @@ import {
 } from "../ui/table";
 import { Button } from "../ui/button";
 import { useThreshold } from "../../context/ThresholdContext";
+import { useMetadata } from "../../context/MetadataContext";
 
 type ColumnDetailsPanelProps = {
   fullKey: string;
   countData: Record<string, number>;
   onClose: () => void;
+};
+
+const isNumericType = (t?: string) => {
+  if (!t) return true;
+  const s = t.toLowerCase();
+  return [
+    "int",
+    "integer",
+    "bigint",
+    "smallint",
+    "tinyint",
+    "float",
+    "double",
+    "decimal",
+    "numeric",
+    "real",
+    "number",
+  ].some((k) => s.includes(k));
 };
 
 const ColumnDetailsPanel: FC<ColumnDetailsPanelProps> = ({
@@ -32,48 +51,74 @@ const ColumnDetailsPanel: FC<ColumnDetailsPanelProps> = ({
   onClose,
 }) => {
   const { thresholdPct } = useThreshold();
+  const { tables } = useMetadata();
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
-  const { columnChartData, alertDates } = useMemo(() => {
-    const entries = Object.entries(countData)
-      .map(([label, value]) => ({ label, value }))
-      .sort((a, b) => a.label.localeCompare(b.label));
-
-    const alerts = new Set<string>();
-
-    for (let i = 1; i < entries.length; i++) {
-      const prev = entries[i - 1].value;
-      const curr = entries[i].value;
-      if (prev === 0) continue;
-      const changePct = ((curr - prev) / prev) * 100;
-      if (Math.abs(changePct) >= thresholdPct) {
-        alerts.add(entries[i].label);
-      }
-    }
-
-    return { columnChartData: entries, alertDates: alerts };
-  }, [countData, thresholdPct]);
-
   const { tableName, columnName } = useMemo(() => {
     const lastDot = fullKey.lastIndexOf(".");
-    if (lastDot === -1) {
-      return { tableName: fullKey, columnName: "" };
-    }
+    if (lastDot === -1) return { tableName: fullKey, columnName: "" };
     return {
       tableName: fullKey.slice(0, lastDot),
       columnName: fullKey.slice(lastDot + 1),
     };
   }, [fullKey]);
 
+  const isNumericColumn = useMemo(() => {
+    const meta = tables.find((t) => t.name === tableName);
+    if (!meta || !columnName) return true;
+
+    const anyMeta: any = meta;
+
+    if (Array.isArray(anyMeta.columns)) {
+      const col = anyMeta.columns.find((c: any) => c?.name === columnName);
+      return isNumericType(col?.type ?? col?.data_type);
+    }
+
+    if (anyMeta.columnTypes && typeof anyMeta.columnTypes === "object") {
+      return isNumericType(anyMeta.columnTypes[columnName]);
+    }
+
+    return true;
+  }, [tables, tableName, columnName]);
+
+  const { columnChartData, alertDates } = useMemo(() => {
+    const entriesRaw = Object.entries(countData)
+      .map(([label, raw]) => ({ label, raw }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+
+    const alerts = new Set<string>();
+
+    for (let i = 1; i < entriesRaw.length; i++) {
+      const prev = entriesRaw[i - 1].raw;
+      const curr = entriesRaw[i].raw;
+      if (prev === 0) continue;
+      const changePct = ((curr - prev) / prev) * 100;
+      if (Math.abs(changePct) >= thresholdPct) alerts.add(entriesRaw[i].label);
+    }
+
+    const entries = entriesRaw.map(({ label, raw }) => ({
+      label,
+      raw,
+      value: isNumericColumn ? raw : raw * 100,
+    }));
+
+    return { columnChartData: entries, alertDates: alerts };
+  }, [countData, thresholdPct, isNumericColumn]);
+
+  const valueHeader = isNumericColumn ? "Count" : "NULL %";
+
+  const formatValue = (raw: number) => {
+    if (isNumericColumn) return raw;
+    return `${(raw * 100).toFixed(2)}%`;
+  };
+
   const handleClose = () => {
     setIsVisible(false);
-    setTimeout(() => {
-      onClose();
-    }, 300);
+    setTimeout(() => onClose(), 300);
   };
 
   return (
@@ -111,8 +156,17 @@ const ColumnDetailsPanel: FC<ColumnDetailsPanelProps> = ({
                 tick={{ fontSize: 10 }}
                 tickLine={false}
                 axisLine={false}
+                tickFormatter={(v) =>
+                  isNumericColumn ? `${v}` : `${Number(v).toFixed(0)}%`
+                }
               />
-              <Tooltip contentStyle={{ fontSize: 12, padding: 8 }} />
+              <Tooltip
+                contentStyle={{ fontSize: 12, padding: 8 }}
+                formatter={(val: any, _name: any, props: any) => {
+                  const raw = props?.payload?.raw as number;
+                  return [formatValue(raw), valueHeader];
+                }}
+              />
               <Line
                 type="monotone"
                 dataKey="value"
@@ -132,12 +186,12 @@ const ColumnDetailsPanel: FC<ColumnDetailsPanelProps> = ({
                   Date
                 </TableHead>
                 <TableHead className="w-1/2 text-md font-bold px-3 py-2 text-slate-600 text-center">
-                  Count
+                  {valueHeader}
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {columnChartData.map(({ label, value }) => (
+              {columnChartData.map(({ label, raw }) => (
                 <TableRow
                   key={label}
                   className="even:bg-slate-50/60 hover:bg-slate-100/70"
@@ -156,7 +210,7 @@ const ColumnDetailsPanel: FC<ColumnDetailsPanelProps> = ({
                     </span>
                   </TableCell>
                   <TableCell className="text-xs px-3 py-2 tabular-nums text-center">
-                    {value}
+                    {formatValue(raw)}
                   </TableCell>
                 </TableRow>
               ))}

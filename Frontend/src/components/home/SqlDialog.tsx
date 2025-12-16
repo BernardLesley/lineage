@@ -32,9 +32,7 @@ const unescapeSparkVars = (s: string) =>
 const safeFormatSpark = (raw: string) => {
   try {
     const escaped = escapeSparkVars(raw);
-    const formatted = formatSql(escaped, {
-      language: "spark",
-    });
+    const formatted = formatSql(escaped, { language: "spark" });
     return unescapeSparkVars(formatted);
   } catch {
     return raw;
@@ -46,17 +44,19 @@ const SqlDialog: FC<SqlDialogProps> = ({ open, table, sql, onOpenChange }) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl bg-white">
-        <DialogHeader>
+      <DialogContent className="w-[min(92vw,56rem)] max-w-none bg-white p-0">
+        <DialogHeader className="px-6 pt-6">
           <DialogTitle>SQL – {table}</DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="mt-4 h-[400px] rounded-md border bg-white">
-          <pre className="min-w-max whitespace-pre rounded-md bg-slate-50 p-4 text-xs font-mono text-slate-900">
-            {formatted}
-          </pre>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+        <div className="px-6 pb-6 pt-4">
+          <ScrollArea className="h-[60vh] max-h-[520px] w-full rounded-md border bg-white">
+            <pre className="w-max min-w-full whitespace-pre rounded-md bg-slate-50 p-4 text-xs font-mono text-slate-900">
+              {formatted}
+            </pre>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );
